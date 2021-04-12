@@ -28,9 +28,9 @@ private:
     Ui::MainWindow *ui;
      QFuture < void > future;
     int myEnable=0;//标志位，用于退出死循环操作
-    int low[500],upper[500];
-    int count=0;
+    QString threadText;
+
 signals:
-    void sig_num( );
+    void sig_num(int );
 };
 #endif // MAINWINDOW_H
