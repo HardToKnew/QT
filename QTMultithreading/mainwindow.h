@@ -21,10 +21,11 @@ private:
     Ui::MainWindow *ui;
     Worker *m_pworker;
     QThread *m_pthread;
+    QString threadText;
 signals:
     void sig_dowork();
 public slots:
-    void slot_finish();
+    void slot_finish(QString);
 private slots:
     void on_pushButton_clicked();
 };

@@ -13,7 +13,7 @@ public:
     Worker(QObject *parent=0);
     ~Worker();
 signals:
-    void sig_finish();
+    void sig_finish(QString);
 
 public slots:
     void slot_dowork();
