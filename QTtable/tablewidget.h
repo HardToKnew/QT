@@ -6,6 +6,7 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QItemSelection>
 #include <QTabWidget>
+#include <QtWidgets>
 
 
 #include "tablemodel.h"
@@ -18,9 +19,12 @@ class TableWidget:public QTabWidget
 {
     Q_OBJECT
 public:
-    TableWidget(QWidget *parent = 0);
+    TableWidget(QMainWindow *parent = 0);
 
-    void setupTab();
+    void setupTab(QMainWindow *mainwindow=nullptr);
+public slots:
+    void showAddEntryDialog();
+    void addEntry(QString start, QString end, QString fhwm, QString netArea, QString grossArea, QString centroid, QString uncertainty);
 private:
     TableModel* table;
     QBoxLayout *mainlayout;

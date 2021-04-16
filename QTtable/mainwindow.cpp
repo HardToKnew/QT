@@ -1,19 +1,26 @@
 #include "mainwindow.h"
+#include "ui_mainwindows.h"
 #include <QBoxLayout>
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
+    : QMainWindow(parent),
+      ui(new Ui::MainWindow)
 {
+    addressWidget = new TableWidget(this);
+    //addressWidget->setupTab(this);
+    setMenus();
 
-    addressWidget = new TableWidget;
-    //addressWidget->setupTab();
-    //this->setCentralWidget(addressWidget);
-   /* QBoxLayout *main=new QHBoxLayout();
-    this ->setLayout(main);
-    main->addWidget(addressWidget,0);*/
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::setMenus()
+{
+    QMenu *FileMenu = menuBar()->addMenu(tr("&add"));
+    QAction *add = new QAction(tr("&Open..."), this);
+    FileMenu->addAction(add);
+    connect(add,&QAction::triggered,addressWidget, &TableWidget::showAddEntryDialog);
 }
 
