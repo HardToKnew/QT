@@ -21,8 +21,15 @@ void TableWidget::setupTab(QMainWindow *mainwindow)
     widget=new QTabWidget(mainwindow) ;
     mainlayout = new QHBoxLayout(widget);
 
-    QTableView *tableView = new QTableView(widget);
-    tableView->setModel(table);
+    tableView = new QTableView(widget);
+
+    //tableView->setModel(table);
+//排序
+    QSortFilterProxyModel *proxy=new QSortFilterProxyModel(tableView);
+    proxy->setSourceModel(table);
+    tableView->setModel(proxy);
+    tableView->setSortingEnabled(true);
+
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     const int Width=80;
     tableView->setColumnWidth(0, Width);
@@ -34,7 +41,15 @@ void TableWidget::setupTab(QMainWindow *mainwindow)
     tableView->setColumnWidth(6, Width);
     mainlayout->addWidget(tableView);
     mainwindow->setCentralWidget(widget);
+
+
 //
+
+        m_pActionCopy = new QAction(tr("复制"), tableView);
+        connect(m_pActionCopy, &QAction::triggered, this, &TableWidget::copyData);
+        tableView->setSelectionMode(QAbstractItemView::ContiguousSelection); //设置为连续选择模式
+        tableView->setContextMenuPolicy(Qt::ActionsContextMenu);             //设置为action菜单模式
+        tableView->addAction(this->m_pActionCopy);
 
 }
 
@@ -60,8 +75,7 @@ void TableWidget::showAddEntryDialog()
 void TableWidget::addEntry(QString start, QString end, QString fhwm, QString netArea, QString grossArea, QString centroid, QString uncertainty)
 {
     QList<ModelItem>  list = table->getList();
-    //QList<QString, QString>
-    //ModelItem pair{start.toDouble(),end.toDouble(),fhwm.toDouble(),netArea.toInt(),grossArea.toInt(),centroid.toDouble(),uncertainty.toDouble()};
+
 
         //if (!list.contains(pair)) {
             table->insertRows(0, 1, QModelIndex());
@@ -87,4 +101,89 @@ void TableWidget::addEntry(QString start, QString end, QString fhwm, QString net
         }*/
 
 
+}
+
+void TableWidget::copyData()
+{
+    tableView->selectAll();//
+    QModelIndexList indexes = tableView->selectionModel()->selectedIndexes();
+
+    if (indexes.count() == 0)
+    {
+        //select nothing
+        return;
+    }
+
+    QMap<QString, QString> map;
+    QModelIndex index;
+    int k = 0;
+    int maxCol = 0;
+    int maxRow = 0;
+    int minCol = 0;
+    int minRow = 0;
+
+    foreach (index, indexes)
+    {
+        int col = index.column();
+        int row = index.row();
+        if (k == 0)
+        {
+            minCol = col;
+            minRow = row;
+        }
+
+        if (col > maxCol)
+            maxCol = col;
+
+        if (row > maxRow)
+            maxRow = row;
+
+        QString text = index.model()->data(index, Qt::DisplayRole).toString();
+
+        map[QString::number(row) + "," + QString::number(col)] = text;
+        k++;
+    }
+
+
+
+    QString rs = "";
+    for (int col=0;col<index.model()->columnCount(index);col++)
+    {
+        rs+=index.model()->headerData(col,Qt::Horizontal).toString()+"\t";
+    }
+    rs+="\n";
+    for (int row = minRow; row <= maxRow; row++)
+    {
+        for (int col = minCol; col <= maxCol; col++)
+        {
+            if (col != minCol)
+                rs += "\t";
+
+            rs += map[QString::number(row) + "," + QString::number(col)];
+        }
+        rs+="\n";
+    }
+
+    rs += "\r\n";
+    //复制到剪贴板
+    QClipboard *board = QApplication::clipboard();
+    board->setText(rs);
+}
+
+void TableWidget::copyData2()
+{
+    QStringList list;
+    QModelIndexList indexes = tableView->selectionModel()->selectedIndexes();
+    if (indexes.count() == 0)
+    {
+        //select nothing
+        return;
+    }
+
+    foreach (const QModelIndex &index, indexes)
+    {
+        list << index.data().toString();
+    }
+
+    QApplication::clipboard()->setText(list.join("\t"));
 }

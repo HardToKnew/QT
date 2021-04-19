@@ -27,9 +27,16 @@ public slots:
     void addEntry(QString start, QString end, QString fhwm, QString netArea, QString grossArea, QString centroid, QString uncertainty);
 private:
     TableModel* table;
+    QTableView *tableView;
     QBoxLayout *mainlayout;
     QTabWidget *widget;
     QTabWidget *centralwidget;
+
+    QAction *m_pActionCopy;
+private slots:
+    void copyData();
+    void copyData2();
+
 };
 
 #endif // TABLEWIDGET_H
