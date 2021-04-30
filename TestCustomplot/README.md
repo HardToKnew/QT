@@ -30,3 +30,21 @@ customPlot->setSelectionRectMode(QCP::SelectionRectMode::srmNone);
 
 customPlot才能发出QCustomPlot::plottableClick signals,设置其他三种状态无法发出QCustomPlot::plottableClick信号
 
+
+
+设置框选true  选中数据会触发QCustomPlot::selectionChangedByUser信号
+
+
+
+父对象指定
+
+https://www.cnblogs.com/lh03061238/p/12326556.html
+
+
+
+选中曲线时显示页面中绑定曲线和表格数据。
+
+选中曲线获取start数据，搜索表格确定数据所在表格行，根据搜索到行删除该行
+
+
+

@@ -1,27 +1,21 @@
 #include "tablewidget.h"
-#include "adddialog.h"
 #include <QHeaderView>
 #include <QPushButton>
 
-TableWidget::TableWidget(QMainWindow *parent)
+TableWidget::TableWidget(QWidget *parent)
     : QTabWidget(parent)
 {
-    table = new TableModel();
-    this->setupTab(parent);
-    //parent->setLayout()
-
-    //this->setCurrentWidget(this);
+    table = new TableModel(this);
+    this->setupTab();
 
 }
 
-void TableWidget::setupTab(QMainWindow *mainwindow)
+void TableWidget::setupTab()
 {
 
-
-    widget=new QTabWidget(mainwindow) ;
-    mainlayout = new QHBoxLayout(widget);
-
-    tableView = new QTableView(widget);
+    mainlayout = new QHBoxLayout(this);
+    this->setLayout(mainlayout);
+    tableView = new QTableView(this);
 
     //tableView->setModel(table);
 //排序
@@ -32,6 +26,7 @@ void TableWidget::setupTab(QMainWindow *mainwindow)
     tableView->sortByColumn(0, Qt::AscendingOrder);//升序
 
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    tableView->setSelectionBehavior(QAbstractItemView::SelectRows);//整行
     const int Width=80;
     tableView->setColumnWidth(0, Width);
     tableView->setColumnWidth(1, Width);
@@ -41,22 +36,21 @@ void TableWidget::setupTab(QMainWindow *mainwindow)
     tableView->setColumnWidth(5, Width);
     tableView->setColumnWidth(6, Width);
     mainlayout->addWidget(tableView);
-    mainwindow->setCentralWidget(widget);
 
-
-//
-
-        m_pActionCopy = new QAction(tr("复制"), tableView);
-        connect(m_pActionCopy, &QAction::triggered, this, &TableWidget::copyData);
-        tableView->setSelectionMode(QAbstractItemView::ContiguousSelection); //设置为连续选择模式
-        tableView->setContextMenuPolicy(Qt::ActionsContextMenu);             //设置为action菜单模式
-        tableView->addAction(this->m_pActionCopy);
+    m_pActionCopy = new QAction(tr("复制"), tableView);
+    connect(m_pActionCopy, &QAction::triggered, this, &TableWidget::copyData);
+    tableView->setSelectionMode(QAbstractItemView::ContiguousSelection); //设置为连续选择模式
+    tableView->setContextMenuPolicy(Qt::ActionsContextMenu);             //设置为action菜单模式
+    tableView->addAction(this->m_pActionCopy);
+    /*connect(tableView->selectionModel(),
+        &QItemSelectionModel::selectionChanged,
+        this, &TableWidget::selectionChanged);*/
 
 }
 
 void TableWidget::showAddEntryDialog()
 {
-    adddialog aDialog;
+    /*adddialog aDialog;
 
     if (aDialog.exec()) {
         QString start = aDialog.startText->text();
@@ -69,7 +63,7 @@ void TableWidget::showAddEntryDialog()
 
 
         addEntry(start, end, FWHM, netArea, grossArea,centroid,uncertainty);
-    }
+    }*/
 
 }
 
@@ -102,6 +96,10 @@ void TableWidget::addEntry(QString start, QString end, QString fhwm, QString net
         }*/
 
 
+}
+void TableWidget::removeEntry(int row)
+{
+    table->removeRows(row, 1, QModelIndex());
 }
 
 void TableWidget::copyData()

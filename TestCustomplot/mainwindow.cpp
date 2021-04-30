@@ -9,6 +9,10 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(centralWidget);
     this->resize(600,400);
 
+    tableDialog = new TableDialog(this);
+
+
+
     customPlot = new QCustomPlot(centralWidget);
     customPlot->xAxis->setRange(-10, 10);
     customPlot->yAxis->setRange(0, 15);
@@ -18,10 +22,19 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     textEdit = new QTextEdit(centralWidget);
+    listWd = new QListWidget(centralWidget);
 
-    QBoxLayout *verticalLayout=new QVBoxLayout(centralWidget);
+    QBoxLayout *herticalLayout=new QHBoxLayout(centralWidget);
+    centralWidget->setLayout(herticalLayout);
+
+    QBoxLayout *verticalLayout=new QVBoxLayout();
     verticalLayout->addWidget(customPlot,4);
     verticalLayout->addWidget(textEdit,1);
+
+
+    herticalLayout->addLayout(verticalLayout,7);
+    herticalLayout->addWidget(listWd,3);
+
 
     setupDemo(customPlot);
 
@@ -50,6 +63,10 @@ void MainWindow::setToolBar(QMainWindow *mainWindow)
     selectQAc->setChecked(false);
     connect(selectQAc,&QAction::toggled,this,&MainWindow::selectToggle);
 
+    QAction *tableQAc = new QAction(tr("表格"),toolBar);
+    toolBar->addAction(tableQAc);
+    connect(tableQAc,&QAction::triggered,this,&MainWindow::tableAction );
+
 
 }
 void MainWindow::setupDemo(QCustomPlot *customPlot)
@@ -73,33 +90,22 @@ void MainWindow::setupDemo(QCustomPlot *customPlot)
     graphPen.setColor(QColor(0,128,0));
     graphPen.setWidthF(1);
     customPlot->graph()->setPen(graphPen);
+    customPlot->setSelectionRectMode(QCP::SelectionRectMode::srmNone);
+    mGraph->setSelectable(QCP::stNone);
   //}
   // show legend with slightly transparent background brush:
-  customPlot->legend->setVisible(true);
-  customPlot->legend->setBrush(QColor(255, 255, 255, 150));
+  //customPlot->legend->setVisible(true);
+  //customPlot->legend->setBrush(QColor(255, 255, 255, 150));
 }
 void MainWindow::contextMenuRequest(QPoint pos)
 {
-    //std::cout<<"pos:"<<pos.x()<<std::endl;
     QMenu *menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
-
-    if (customPlot->legend->selectTest(pos, false) >= 0) // context menu on legend requested
-    {
-      menu->addAction("Move to top left", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignLeft));
-      menu->addAction("Move to top center", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignHCenter));
-      menu->addAction("Move to top right", this, SLOT(moveLegend()))->setData((int)(Qt::AlignTop|Qt::AlignRight));
-      menu->addAction("Move to bottom right", this, SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignRight));
-      menu->addAction("Move to bottom left", this, SLOT(moveLegend()))->setData((int)(Qt::AlignBottom|Qt::AlignLeft));
-    } else  // general context menu on graphs requested
-    {
-      menu->addAction("Add random graph", this, &MainWindow::addRandomGraph);
-      if (customPlot->selectedGraphs().size() > 0)
+    menu->addAction("Add random graph", this, &MainWindow::addRandomGraph);
+    if (customPlot->selectedGraphs().size() > 0)
         menu->addAction("Remove selected graph", this, &MainWindow::removeSelectedGraph);
-      if (customPlot->graphCount() > 0)
+    if (customPlot->graphCount() > 0)
         menu->addAction("Remove all graphs", this, &MainWindow::removeAllGraphs);
-    }
-
     menu->popup(customPlot->mapToGlobal(pos));
 }
 void MainWindow::addRandomGraph()
@@ -108,115 +114,143 @@ void MainWindow::addRandomGraph()
     double start=0,end=10;
     QString X = QInputDialog::getText(this, "QCustomPlot example", "x:", QLineEdit::Normal, "0", &ok);
     if (ok)
-    {
-      //axis->setLabel(newLabel);
-      //ui->customPlot->replot();
         start=X.toDouble();
-    }
     QString Y = QInputDialog::getText(this, "QCustomPlot example", "y:", QLineEdit::Normal, "10", &ok);
     if (ok)
-    {
-      //axis->setLabel(newLabel);
-      //ui->customPlot->replot();
         end = Y.toDouble();
+    int Bengin,End;
+    Bengin = mGraph->data()->findBegin(start)-mGraph->data()->constBegin();
+    End = mGraph->data()->findBegin(end)-mGraph->data()->constBegin();
+    QString Strstart = QString::number(mGraph->data()->at(Bengin)->key);
+    QString Strend = QString::number(mGraph->data()->at(End)->key);
+    tableDialog->tableWidget->addEntry(Strstart,Strend,"0","0","0","0","0");
+
+    int n = End-Bengin; // number of points in graph
+    QVector<double> x(n), y(n);
+    for(int i=0,k=Bengin;k<End;i++,k++)
+    {
+        QString str_key = QString::number(mGraph->data()->at(k)->key);
+        QString str_value = QString::number(mGraph->data()->at(k)->value);
+        x[i]=mGraph->data()->at(k)->key;
+        y[i]=mGraph->data()->at(k)->value;
+        QString message =str_key+"::"+str_value;
+        listWd->addItem(message);
     }
-    //customPlot->setSelectionRectMode(QCP::SelectionRectMode::srmSelect);             // 鼠标框选
-    //customPlot->graph()->setSelectable(QCP::stDataRange);
-    double length =200/10;
-    int xstart = start*length, xend=end*length;
-  int n = 200; // number of points in graph
-  double xScale = (std::rand()/(double)RAND_MAX + 0.5)*2;
-  double yScale = (std::rand()/(double)RAND_MAX + 0.5)*2;
-  double xOffset = (std::rand()/(double)RAND_MAX - 0.5)*4;
-  double yOffset = (std::rand()/(double)RAND_MAX - 0.5)*10;
-  double r1 = (std::rand()/(double)RAND_MAX - 0.5)*2;
-  double r2 = (std::rand()/(double)RAND_MAX - 0.5)*2;
-  double r3 = (std::rand()/(double)RAND_MAX - 0.5)*2;
-  double r4 = (std::rand()/(double)RAND_MAX - 0.5)*2;
-  QVector<double> x(n), y(n);
-  for (int i=0; i<n; i++)
-  {
-    x[i] = (i/(double)n-0.5)*10.0*xScale + xOffset;
-    y[i] = (qSin(x[i]*r1*5)*qSin(qCos(x[i]*r2)*r4*3)+r3*qCos(qSin(x[i])*r4*2))*yScale + yOffset;
-  }
+    customPlot->addGraph();
+    customPlot->graph()->setName(QString("New graph %1").arg(customPlot->graphCount()-1));//设置曲线名称
+    customPlot->graph()->setData(x, y);//导入数据
+    customPlot->graph()->setLineStyle((QCPGraph::LineStyle)(1));//设置
+    customPlot->graph()->setScatterStyle(QCPScatterStyle::ssNone);//设置散点形状
+    QPen graphPen;
+    graphPen.setColor(QColor(64,64,64));
+    graphPen.setWidthF(1);
+    customPlot->graph()->setPen(graphPen);
 
-  customPlot->addGraph();
-  customPlot->graph()->setName(QString("New graph %1").arg(customPlot->graphCount()-1));//设置曲线名称
-  customPlot->graph()->setData(x, y);//导入数据
-  customPlot->graph()->setLineStyle((QCPGraph::LineStyle)(1));//设置
-  customPlot->graph()->setScatterStyle(QCPScatterStyle::ssNone);//设置散点形状
-  QPen graphPen;
-  graphPen.setColor(QColor(64,64,64));
-  graphPen.setWidthF(1);
-  customPlot->graph()->setPen(graphPen);
-
-  //customPlot->graph()->setBrush(QBrush(QColor(0,0,255,255)));
-  customPlot->replot();
+    customPlot->graph()->setBrush(QBrush(QColor(0,0,255,255)));
+    customPlot->replot();
 }
 
 void MainWindow::selectionChanged()
 {
-    std::cout<<customPlot->graphCount()<<"::"<<customPlot->selectedGraphs().size()<<std::endl;
-    for (int i=0; i<customPlot->graphCount(); ++i)
+    listWd->clear();
+    QString message;
+    if(mGraph->selected()&&select)
     {
-      QCPGraph *graph =customPlot->graph(i);
-      //QCPPlottableLegendItem *item = customPlot->legend->itemWithPlottable(graph);
-      if ( graph->selected())
-      {
-
-       //;// graph->setBrush(QBrush(QColor(0,245,255,255)));
-          double dataValue = graph->interface1D()->dataMainValue(i);
-          double dataXValue = graph->interface1D()->dataMainKey(i);
-          QString message = QString("Clicked on graph '%1' at data point #%2  with Xvalue %3 ").arg(graph->name()).arg(i).arg(dataXValue)+QString("Yvlaue: %3.").arg(dataValue);
-          textEdit->setText(message);
-          int ms= ((int)graph->interface1D());
-          std::cout<<i<<"selectionChanged idpoint:"<<graph->interface1D()<<":"<<graph->interface1D()->dataMainKey(i)<<"int:"<<std::hex << static_cast<unsigned int>(ms)<<std::endl;
-          std::cout<<message.toStdString()<<std::endl;
-      }
+        QCPDataSelection selection =mGraph->selection();
+        QCPDataRange dataRange = selection.dataRange();//选中一个区域
+        int n= dataRange.end()-dataRange.begin();
+        QVector<double> x(n), y(n);
+        for(int i=0,k=dataRange.begin();k<dataRange.end();i++,k++)
+        {
+            QString str_key = QString::number(mGraph->data()->at(k)->key);
+            QString str_value = QString::number(mGraph->data()->at(k)->value);
+            x[i]=mGraph->data()->at(k)->key;
+            y[i]=mGraph->data()->at(k)->value;
+            message ="key:"+str_key+" value:"+str_value;
+            listWd->addItem(message);
+        }
+        QString start = QString::number(mGraph->data()->at(dataRange.begin())->key);
+        QString end = QString::number(mGraph->data()->at(dataRange.end())->key);
+        tableDialog->tableWidget->addEntry(start,end,"0","0","0","0","0");
+        customPlot->addGraph();
+        customPlot->graph()->setName(QString("New graph %1").arg(customPlot->graphCount()-1));
+        customPlot->graph()->setData(x, y);
+        customPlot->graph()->setBrush(QBrush(QColor(0,0,255,255)));
+        QPen graphPen;
+        graphPen.setColor(QColor(64,64,64));
+        customPlot->graph()->setPen(graphPen);
+        customPlot->replot();
+        textEdit->setText("Beagin:"+QString::number(dataRange.begin()));
     }
 }
 void MainWindow::removeSelectedGraph()
 {
-
-    if (customPlot->selectedGraphs().size() > 0)
+    if (customPlot->selectedGraphs().size() > 0&&customPlot->selectedGraphs().first()!=mGraph)
     {
+        QCPGraph *graph=customPlot->selectedGraphs().first();
+        QString str=QString::number(graph->data()->constBegin()->key);
+        str.remove(QRegExp("\\s"));
+        std::cout<<"str:"+str.toStdString()<<std::endl;
+        QTableView *tableview=tableDialog->tableWidget->tableView;
+        for(int i=0;i<tableview->model()->rowCount();i++)
+        {
+            //tableview->setRowHidden(i,true);
+            QString r="";
+            //提取表格第一列数据
+            QAbstractItemModel *model=tableview->model();
+            QModelIndex index;
+            index=model->index(i,0);
+            r=model->data(index).toString();
+            std::cout<<"r:"+r.toStdString()<<std::endl;
+            r.remove(QRegExp("\\s"));
+            if(r.contains(str,Qt::CaseSensitive)){
+                //tableview->setRowHidden(i,false);//隐藏
+                tableDialog->tableWidget->removeEntry(i);
+                std::cout<<"delete:"<<r.toStdString()<<std::endl;
+            }
+
+
+        }
         customPlot->removeGraph(customPlot->selectedGraphs().first());
         customPlot->replot();
+
     }
 
 }
 void MainWindow::removeAllGraphs()
 {
-    customPlot->clearGraphs();
+    for (int i=customPlot->graphCount()-1; i!=0; --i)
+    {
+      QCPGraph *graph = customPlot->graph(i);
+      if(graph!=mGraph)
+        customPlot->removeGraph(graph);
+    }
     customPlot->replot();
 
 }
 void MainWindow::graphClicked(QCPAbstractPlottable *plottable, int dataIndex)
 {
-    std::cout<<"graphClicked:"<<std::endl;
     double dataValue = plottable->interface1D()->dataMainValue(dataIndex);
-    double dataXValue = plottable->interface1D()->dataMainKey(dataIndex);
-    QString message = QString("Clicked on graph '%1' at data point #%2  with Xvalue %3 ").arg(plottable->name()).arg(dataIndex).arg(dataXValue)+QString("Yvlaue: %3.").arg(dataValue);
+    QString message = QString("Clicked on graph '%1' at data point #%2 with value %3.").arg(plottable->name()).arg(dataIndex).arg(dataValue);
     textEdit->setText(message);
-    int ms= ((int)plottable->interface1D());
-    std::cout<<dataIndex<<"graphClicked idpoint:"<<plottable->interface1D()<<":"<<plottable->interface1D()->dataMainKey(dataIndex)<<"int:"<<std::hex << static_cast<unsigned int>(ms)<<std::endl;
-    std::cout<<message.toStdString()<<std::endl;
 }
 void  MainWindow::selectToggle (bool checked)
 {
-    std::cout<<"Toggle: "<<checked<<std::endl;
-
+    select=checked;
     if(checked)
     {
         customPlot->setSelectionRectMode(QCP::SelectionRectMode::srmSelect);
         mGraph->setSelectable(QCP::stDataRange);
-        std::cout<<"srmSelect"<<std::endl;
     }
     else
     {
         customPlot->setSelectionRectMode(QCP::SelectionRectMode::srmNone);
-        std::cout<<"srmNoSelect"<<std::endl;
+        mGraph->setSelectable(QCP::stNone);
     }
+}
+void MainWindow::tableAction ()
+{
+    tableDialog->exec();
 }
 
 MainWindow::~MainWindow()
