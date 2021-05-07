@@ -48,3 +48,27 @@ https://www.cnblogs.com/lh03061238/p/12326556.html
 
 
 
+A4划线
+
+![image-20210507094451702](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20210507094451702.png)
+
+```
+QVector<QLine> lines;
+lines.append(QLine(QPoint(0,0),QPoint(792,0)));//上边
+lines.append(QLine(QPoint(0,1122),QPoint(792,1122)));//1
+lines.append(QLine(QPoint(0,0),QPoint(0,1122)));//1
+lines.append(QLine(QPoint(792,0),QPoint(792,1122)));//1
+
+lines.append(QLine(QPoint(0,5),QPoint(792,5)));
+lines.append(QLine(QPoint(0,10),QPoint(792,10)));
+lines.append(QLine(QPoint(0,20),QPoint(792,20)));
+
+lines.append(QLine(QPoint(5,0),QPoint(5,1122)));
+lines.append(QLine(QPoint(10,0),QPoint(10,1122)));
+lines.append(QLine(QPoint(20,0),QPoint(20,1122)));
+painter->drawLines(lines);
+               
+painter->drawText(50,50,500,30,Qt::AlignVCenter,rs);
+painter->drawText(50,80,500,30,Qt::AlignVCenter,rs);
+painter->drawText(50,100,500,30,Qt::AlignVCenter,rs);
+```

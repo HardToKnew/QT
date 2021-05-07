@@ -13,6 +13,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void createPix(QPixmap *pix);
+    //virtual bool newPage();
 private:
     QCustomPlot *customPlot;
     QWidget *centralWidget;
@@ -29,6 +31,8 @@ private:
 
     void setToolBar(QMainWindow *mainWindow);
     void setupDemo(QCustomPlot *customPlot);
+    void drawPic(QPrinter *printerPixmap);
+
 
 private slots:
     void contextMenuRequest(QPoint);
@@ -39,5 +43,6 @@ private slots:
     void graphClicked(QCPAbstractPlottable *plottable, int dataIndex);
     void selectToggle (bool checked);
     void tableAction ();
+    void printAction();
 };
 #endif // MAINWINDOW_H

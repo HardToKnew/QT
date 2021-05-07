@@ -67,6 +67,11 @@ void MainWindow::setToolBar(QMainWindow *mainWindow)
     toolBar->addAction(tableQAc);
     connect(tableQAc,&QAction::triggered,this,&MainWindow::tableAction );
 
+    QAction *printQAc = new QAction(tr("打印"),toolBar);
+    toolBar->addAction(printQAc);
+    connect(printQAc,&QAction::triggered,this,&MainWindow::printAction);
+
+
 
 }
 void MainWindow::setupDemo(QCustomPlot *customPlot)
@@ -252,6 +257,81 @@ void MainWindow::tableAction ()
 {
     tableDialog->exec();
 }
+void MainWindow::printAction()
+{
+    QPrinter printer(QPrinter::HighResolution);
+    printer.setOutputFormat(QPrinter::PdfFormat);  //设置输出格式为pdf
+       //自定义纸张大小，特别重要，不然预览效果极差
+       printer.setPageSize(QPrinter::Custom);
+       printer.setPaperSize(QSizeF(600, 800),
+                                  QPrinter::Point);
+       QPrintPreviewDialog preview(&printer, this);// 创建打印预览对话框
+
+       preview.setMinimumSize(1000,600);
+       /*
+        * QPrintPreviewDialog类提供了一个打印预览对话框，里面功能比较全，
+        * paintRequested(QPrinter *printer)是系统提供的，
+        * 当preview.exec()执行时该信号被触发，
+        * drawPic(QPrinter *printer)是自定义的槽函数，图像的绘制就在这个函数里。
+        */
+       //connect(&preview, SIGNAL(paintRequested(QPrinter*)), SLOT(drawPic(QPrinter*)));
+       connect(&preview, &QPrintPreviewDialog::paintRequested, this,&MainWindow::drawPic);
+       preview.exec();
+}
+
+void MainWindow::drawPic(QPrinter *printerPixmap)
+{
+    QPixmap pix = QPixmap(800,600);
+    //这个函数算是画模板的函数吧，毕竟打印时有模板的
+    createPix(&pix);
+    //pix.save(sFilePix);
+    //纵向：Portrait 横向：Landscape
+    //printerPixmap->setOrientation(QPrinter::Landscape);
+    //获取界面的图片
+    QPainter painterPixmap(this);
+    painterPixmap.begin(printerPixmap);
+    QRect rect = painterPixmap.viewport();
+    int x = rect.width() / pix.width();
+    int y = rect.height() / pix.height();
+    //设置图像长宽是原图的多少倍
+    painterPixmap.scale(x, y);
+    painterPixmap.drawPixmap(0, 0, pix);
+    painterPixmap.end();
+}
+void MainWindow::createPix(QPixmap *pix)
+{
+    QPainter *painter = new QPainter(this);
+       painter->begin(pix);
+       painter->setRenderHint(QPainter::Antialiasing, true);
+       // 设置画笔颜色、宽度
+       painter->setPen(QPen(QColor(255, 255, 255), 2));
+       // 设置画刷颜色
+       painter->setBrush(QColor(255, 255, 255));
+       QRect rect(0,0,800,600);
+       //整张图设置画刷白底
+       painter->fillRect(rect,QColor(255, 255, 255));
+       painter->drawRect(rect);
+       //画数据部分的线条
+       painter->setPen(QPen(QColor(0, 0, 0)));
+       QVector<QLine> lines;
+       lines.append(QLine(QPoint(50,50),QPoint(750,50)));//上边
+       lines.append(QLine(QPoint(55,45),QPoint(55,550)));//1
+       lines.append(QLine(QPoint(155,45),QPoint(155,550)));//1
+       painter->drawLines(lines);
+    QFont font;
+    font.setPointSize(13);
+    font.setFamily("黑体");
+    font.setItalic(true);
+    painter->setFont(font);
+
+    painter->end();
+}
+
+/*bool MainWindow::newPage()
+{
+    MainWindow::printAction();
+}*/
+
 
 MainWindow::~MainWindow()
 {

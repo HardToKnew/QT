@@ -7,7 +7,7 @@
 #include <QItemSelection>
 #include <QTabWidget>
 #include <QtWidgets>
-
+#include <QPrinter>
 
 #include "tablemodel.h"
 
@@ -36,9 +36,15 @@ private:
     QTabWidget *centralwidget;
 
     QAction *m_pActionCopy;
+
+    void createPix(QPixmap *pix);
+    void drawPic(QPrinter *printerPixmap);
+    void printPages(QPainter *painter,int page);
+
 private slots:
     void copyData();
     void copyData2();
+    void printAction();
 
 };
 
