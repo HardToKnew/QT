@@ -21,12 +21,11 @@ void TableWidget::setupTab()
     this->setLayout(mainlayout);
     tableView = new QTableView(this);
 
-    //tableView->setModel(table);
-//排序
+
     QSortFilterProxyModel *proxy=new QSortFilterProxyModel(tableView);
     proxy->setSourceModel(table);
     tableView->setModel(proxy);
-    tableView->setSortingEnabled(true);
+    tableView->setSortingEnabled(true);//排序
     tableView->sortByColumn(0, Qt::AscendingOrder);//升序
 
     tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -50,28 +49,12 @@ void TableWidget::setupTab()
     QAction *ActionPrint = new QAction(tr("打印"), tableView);
     connect(ActionPrint, &QAction::triggered, this, &TableWidget::printAction);
     tableView->addAction(ActionPrint);
-    /*connect(tableView->selectionModel(),
-        &QItemSelectionModel::selectionChanged,
-        this, &TableWidget::selectionChanged);*/
 
 }
 
 void TableWidget::showAddEntryDialog()
 {
-    /*adddialog aDialog;
 
-    if (aDialog.exec()) {
-        QString start = aDialog.startText->text();
-        QString end = aDialog.endText->text();
-        QString FWHM = aDialog.fhwmText->text();
-        QString netArea = aDialog.netAreaText->text();
-        QString grossArea = aDialog.grossAreaText->text();
-        QString centroid = aDialog.centroidText->text();
-        QString uncertainty = aDialog.uncertaintyText->text();
-
-
-        addEntry(start, end, FWHM, netArea, grossArea,centroid,uncertainty);
-    }*/
 
 }
 
@@ -79,8 +62,6 @@ void TableWidget::addEntry(QString start, QString end, QString fhwm, QString net
 {
     QList<ModelItem>  list = table->getList();
 
-
-        //if (!list.contains(pair)) {
             table->insertRows(0, 1, QModelIndex());
 
             QModelIndex index = table->index(0, 0, QModelIndex());
@@ -97,11 +78,7 @@ void TableWidget::addEntry(QString start, QString end, QString fhwm, QString net
             table->setData(index, centroid.toDouble(), Qt::EditRole);
             index = table->index(0, 6, QModelIndex());
             table->setData(index, uncertainty.toDouble(), Qt::EditRole);
-            //removeTab(indexOf(newAddressTab));
-        /*} else {
-            QMessageBox::information(this, tr("Duplicate Name"),
-                tr("The start \"%1\" already exists.").arg(start));
-        }*/
+
 
 
 }
@@ -115,11 +92,6 @@ void TableWidget::copyData()
     tableView->selectAll();//
     QModelIndexList indexes = tableView->selectionModel()->selectedIndexes();
 
-    if (indexes.count() == 0)
-    {
-        //select nothing
-        return;
-    }
 
     QMap<QString, QString> map;
     QModelIndex index;
@@ -197,43 +169,26 @@ void TableWidget::copyData2()
 
 void TableWidget::printAction()
 {
-   /* QPrinter printer(QPrinter::HighResolution);
-    printer.setOutputFormat(QPrinter::PdfFormat);  //设置输出格式为pdf
-       //自定义纸张大小，特别重要，不然预览效果极差
-       printer.setPageSize(QPrinter::Custom);
-       printer.setPaperSize(QSizeF(600, 800),
-                                  QPrinter::Point);
-       QPrintPreviewDialog preview(&printer, this);// 创建打印预览对话框
 
-       preview.setMinimumSize(1000,600);
-       /*
-        * QPrintPreviewDialog类提供了一个打印预览对话框，里面功能比较全，
-        * paintRequested(QPrinter *printer)是系统提供的，
-        * 当preview.exec()执行时该信号被触发，
-        * drawPic(QPrinter *printer)是自定义的槽函数，图像的绘制就在这个函数里。
-        */
-       //connect(&preview, SIGNAL(paintRequested(QPrinter*)), SLOT(drawPic(QPrinter*)));
-       /*connect(&preview, &QPrintPreviewDialog::paintRequested, this,&TableWidget::drawPic);
-       preview.exec();*/
+
+
     QPrinter printer;
     QPrintDialog *Dialog = new QPrintDialog (&printer);
     if (Dialog->exec()){
-        QPainter *painter = new QPainter(this);
+        QPainter *painter = new QPainter();
         if(painter->begin(&printer))
         {
-            //QPainter *painter = new QPainter(this);
-            //painter->begin(&printer);
-               painter->setRenderHint(QPainter::Antialiasing, true);
+            painter->setRenderHint(QPainter::Antialiasing, true);
                // 设置画笔颜色、宽度
-               painter->setPen(QPen(QColor(255, 255, 255), 2));
+            painter->setPen(QPen(QColor(255, 255, 255), 2));
                // 设置画刷颜色
-               painter->setBrush(QColor(255, 255, 255));
-               QRect rect(0,0,800,600);
+            painter->setBrush(QColor(255, 255, 255));
+            QRect rect(0,0,800,600);
                //整张图设置画刷白底
-               painter->fillRect(rect,QColor(255, 255, 255));
-               painter->drawRect(rect);
+            painter->fillRect(rect,QColor(255, 255, 255));
+            painter->drawRect(rect);
                //画数据部分的线条
-               painter->setPen(QPen(QColor(0, 0, 0)));
+            painter->setPen(QPen(QColor(0, 0, 0)));
 
             QFont font;
             font.setPointSize(12);
@@ -274,14 +229,6 @@ void TableWidget::printAction()
                 k++;
             }
 
-
-
-
-
-
-
-
-
             for (int row = 0,i=0,page=1; row <= maxRow;i++, row++)
             {
 
@@ -303,25 +250,6 @@ void TableWidget::printAction()
     }
 }
 
-void TableWidget::drawPic(QPrinter *printerPixmap)
-{
-    QPixmap pix = QPixmap(800,600);
-    //这个函数算是画模板的函数吧，毕竟打印时有模板的
-    createPix(&pix);
-    //pix.save(sFilePix);
-    //纵向：Portrait 横向：Landscape
-    //printerPixmap->setOrientation(QPrinter::Landscape);
-    //获取界面的图片
-    QPainter painterPixmap(this);
-    painterPixmap.begin(printerPixmap);
-    QRect rect = painterPixmap.viewport();
-    int x = rect.width() / pix.width();
-    int y = rect.height() / pix.height();
-    //设置图像长宽是原图的多少倍
-    painterPixmap.scale(x, y);
-    painterPixmap.drawPixmap(0, 0, pix);
-    painterPixmap.end();
-}
 
 void TableWidget::printPages(QPainter *painter,int page)
 {
@@ -356,61 +284,4 @@ void TableWidget::printPages(QPainter *painter,int page)
     painter->drawLines(lines);
 
 }
-void TableWidget::createPix(QPixmap *pix)
-{
-    QPainter *painter = new QPainter(this);
-       painter->begin(pix);
-       painter->setRenderHint(QPainter::Antialiasing, true);
-       // 设置画笔颜色、宽度
-       painter->setPen(QPen(QColor(255, 255, 255), 2));
-       // 设置画刷颜色
-       painter->setBrush(QColor(255, 255, 255));
-       QRect rect(0,0,800,600);
-       //整张图设置画刷白底
-       painter->fillRect(rect,QColor(255, 255, 255));
-       painter->drawRect(rect);
-       //画数据部分的线条
-       painter->setPen(QPen(QColor(0, 0, 0)));
-       QVector<QLine> lines;
-       lines.append(QLine(QPoint(50,50),QPoint(750,50)));//上边
-       lines.append(QLine(QPoint(55,45),QPoint(55,550)));//1
-       lines.append(QLine(QPoint(155,45),QPoint(155,550)));//1
-       painter->drawLines(lines);
-    QFont font;
-    font.setPointSize(12);
-    font.setFamily("黑体");
-    font.setItalic(true);
-    painter->setFont(font);
 
-    tableView->selectAll();
-    QModelIndexList indexes = tableView->selectionModel()->selectedIndexes();
-    QString rs = "";
-    QModelIndex index;
-    foreach (index, indexes)
-    {
-
-    }
-    QMap<QString, QString> map;
-    for (int col=0;col<table->columnCount(index);col++)
-    {
-        rs+=table->headerData(col,Qt::Horizontal,Qt::DisplayRole).toString()+"\t";
-    }
-    rs+="\n";
-    for (int row = 0; row < table->rowCount(index); row++)
-    {
-        for (int col = 0; col < table->columnCount(index); col++)
-        {
-            if (col != 0)
-                rs += "\t";
-            QString text = table->data(index, Qt::DisplayRole).toString();
-           //map[QString::number(row) + "," + QString::number(col)] = text;
-
-            rs += text;
-        }
-        rs+="\n";
-    }
-    painter->drawText(60,490,700,30,Qt::AlignVCenter,rs);
-
-
-    painter->end();
-}

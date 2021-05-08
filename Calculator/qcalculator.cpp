@@ -1,0 +1,41 @@
+#include "qcalculator.h"
+
+QCalculator::QCalculator()
+{
+}
+
+bool QCalculator::construct()
+{
+    m_ui = QCalculatorUI::NewInstance();
+
+    if( m_ui != NULL )
+    {
+        m_ui->setCalculator(&m_cal); // UI与业务逻辑相关类对象产生关联
+    }
+
+    return (m_ui != NULL);
+}
+
+QCalculator* QCalculator::NewInstance()
+{
+    QCalculator* ret = new QCalculator();
+
+    if( (ret == NULL) || !ret->construct() )
+    {
+        delete ret;
+        ret = NULL;
+    }
+
+    return ret;
+}
+
+
+void QCalculator::show()
+{
+    m_ui->show();
+}
+
+QCalculator::~QCalculator()
+{
+    delete m_ui;
+}

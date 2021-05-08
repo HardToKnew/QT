@@ -8,6 +8,7 @@
 #include <QTabWidget>
 #include <QtWidgets>
 #include <QPrinter>
+#include <QPrintDialog>
 
 #include "tablemodel.h"
 
@@ -37,9 +38,8 @@ private:
 
     QAction *m_pActionCopy;
 
-    void createPix(QPixmap *pix);
-    void drawPic(QPrinter *printerPixmap);
     void printPages(QPainter *painter,int page);
+
 
 private slots:
     void copyData();

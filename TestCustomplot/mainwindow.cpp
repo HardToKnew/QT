@@ -43,11 +43,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     connect(customPlot, &QCustomPlot::selectionChangedByUser, this, &MainWindow::selectionChanged);
-    //connect(customPlot, SIGNAL(selectionChangedByUser()), this, SLOT(selectionChanged()));
 
     customPlot->setContextMenuPolicy(Qt::CustomContextMenu);//开启QWidget::customContextMenuRequested信号
     connect(customPlot, &QWidget::customContextMenuRequested, this, &MainWindow::contextMenuRequest);
-    //connect(customPlot, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(contextMenuRequest(QPoint)));
 
     connect(customPlot, &QCustomPlot::plottableClick, this,&MainWindow::graphClicked);
 
@@ -81,7 +79,7 @@ void MainWindow::setupDemo(QCustomPlot *customPlot)
     QColor color(0,0, 255);
     customPlot->graph()->setLineStyle(QCPGraph::lsLine);
     customPlot->graph()->setPen(QPen(color.lighter(200)));
-    //customPlot->graph()->setBrush(QBrush(color));
+
     // generate random walk data:
     QVector<QCPGraphData> timeData(200);
     for (int i=0; i<200; ++i)
@@ -97,10 +95,7 @@ void MainWindow::setupDemo(QCustomPlot *customPlot)
     customPlot->graph()->setPen(graphPen);
     customPlot->setSelectionRectMode(QCP::SelectionRectMode::srmNone);
     mGraph->setSelectable(QCP::stNone);
-  //}
-  // show legend with slightly transparent background brush:
-  //customPlot->legend->setVisible(true);
-  //customPlot->legend->setBrush(QColor(255, 255, 255, 150));
+
 }
 void MainWindow::contextMenuRequest(QPoint pos)
 {
@@ -206,12 +201,10 @@ void MainWindow::removeSelectedGraph()
             QModelIndex index;
             index=model->index(i,0);
             r=model->data(index).toString();
-            std::cout<<"r:"+r.toStdString()<<std::endl;
             r.remove(QRegExp("\\s"));
             if(r.contains(str,Qt::CaseSensitive)){
-                //tableview->setRowHidden(i,false);//隐藏
                 tableDialog->tableWidget->removeEntry(i);
-                std::cout<<"delete:"<<r.toStdString()<<std::endl;
+
             }
 
 
