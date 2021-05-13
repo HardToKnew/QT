@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "qcustomplot.h"
+#include "myqcustomplot.h"
 #include "tabledialog.h"
 
 
@@ -16,7 +16,7 @@ public:
     void createPix(QPixmap *pix);
     //virtual bool newPage();
 private:
-    QCustomPlot *customPlot;
+    MyQCustomPlot *customPlot;
     QWidget *centralWidget;
     QTextEdit *textEdit;
     QListWidget *listWd;
@@ -28,6 +28,7 @@ private:
     bool select=false;
     //QFrame *frame;
     //QFrame *frame2;
+    bool isLeftMousePress = false;
 
     void setToolBar(QMainWindow *mainWindow);
     void setupDemo(QCustomPlot *customPlot);
@@ -44,5 +45,9 @@ private slots:
     void selectToggle (bool checked);
     void tableAction ();
     void printAction();
+protected:
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 };
 #endif // MAINWINDOW_H

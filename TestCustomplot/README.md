@@ -36,9 +36,7 @@ customPlot才能发出QCustomPlot::plottableClick signals,设置其他三种状�
 
 
 
-父对象指定
-
-https://www.cnblogs.com/lh03061238/p/12326556.html
+[父对象指定](https://www.cnblogs.com/lh03061238/p/12326556.html)
 
 
 
@@ -48,11 +46,13 @@ https://www.cnblogs.com/lh03061238/p/12326556.html
 
 
 
+[框选放大数据](https://blog.csdn.net/yxy244/article/details/100547688 "框选")
+
 A4划线
 
-![image-20210507094451702](C:\Users\lenovo\AppData\Roaming\Typora\typora-user-images\image-20210507094451702.png)
+![](https://i.loli.net/2021/05/08/15IGdgBFxmAeWOK.png)
 
-```
+```c++
 QVector<QLine> lines;
 lines.append(QLine(QPoint(0,0),QPoint(792,0)));//上边
 lines.append(QLine(QPoint(0,1122),QPoint(792,1122)));//1
@@ -72,3 +72,4 @@ painter->drawText(50,50,500,30,Qt::AlignVCenter,rs);
 painter->drawText(50,80,500,30,Qt::AlignVCenter,rs);
 painter->drawText(50,100,500,30,Qt::AlignVCenter,rs);
 ```
+

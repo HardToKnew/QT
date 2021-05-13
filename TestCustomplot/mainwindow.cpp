@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    customPlot = new QCustomPlot(centralWidget);
+    customPlot = new MyQCustomPlot(centralWidget);
     customPlot->xAxis->setRange(-10, 10);
     customPlot->yAxis->setRange(0, 15);
     customPlot->setInteractions(/*QCP::iRangeDrag | QCP::iRangeZoom| QCP::iSelectAxes |
@@ -324,7 +324,65 @@ void MainWindow::createPix(QPixmap *pix)
 {
     MainWindow::printAction();
 }*/
+void MainWindow::mousePressEvent(QMouseEvent *event)
+{
+    double x_pos=event->pos().x();
+    std::cout<<"x_pos"<<std::endl;
+    if(customPlot->viewport().contains(event->pos()))
+    {
+        if(event->button() == Qt::LeftButton)
+        {
+            isLeftMousePress = true;
+            //MousePress = true;
+            //emit MouseEvent(event);
+            //xMousePix=event->pos().x();
+            //xMousePix=this->xAxis->pixelToCoord(event->pos().x());
+        }
+    }
 
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    isLeftMousePress = false;
+    //MousePress = false;
+}
+void MainWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    double x_pos=event->pos().x();//16 yAxis pixe  790 pixe 16384  缩放有影响
+    if(customPlot->viewport().contains(event->pos()))//在区域范围
+    {
+        if(isLeftMousePress ==true)
+        {
+            removeAllGraphs();
+             event->pos().x();
+             event->pos().y();//MousePress = false;
+            //emit MouseEvent(event);
+             customPlot->xAxis->pixelToCoord(event->pos().x());
+             customPlot->yAxis->pixelToCoord(event->pos().y());
+
+             //cout<<"mPointX:"<<mPointX<<endl;
+             QVector<double> xValues,yValues;
+
+
+             xValues.append(customPlot->xAxis->pixelToCoord(event->pos().x()));
+             yValues.append(0);
+             xValues.append(customPlot->xAxis->pixelToCoord(event->pos().x()));
+             yValues.append(customPlot->yAxis->range().size()/2);
+             xValues.append(customPlot->xAxis->pixelToCoord(event->pos().x()));
+             yValues.append(customPlot->yAxis->range().size());
+             customPlot->addGraph();
+             customPlot->graph()->setData(xValues,yValues);
+             customPlot->graph()->setPen(QPen(QColor(5, 5, 5)));
+             customPlot->graph()->setPen(QPen(Qt::DashLine));//游标线型：虚线
+             customPlot ->replot(QCustomPlot::rpQueuedReplot);
+            //xMousePix=this->xAxis->pixelToCoord(event->pos().x());
+        }
+    }
+        //cout<<this->viewport().contains(event->pos())<<endl;
+        //cout<<(event->button() == Qt::LeftButton)<<"x:"<<x_pos<<"   "<<this->xAxis->pixelToCoord(x_pos)<<"  "<< ""<<endl;
+
+}
 
 MainWindow::~MainWindow()
 {
