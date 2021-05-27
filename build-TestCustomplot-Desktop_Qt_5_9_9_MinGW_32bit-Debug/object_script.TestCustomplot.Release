@@ -1,0 +1,17 @@
+INPUT(
+./release\CrossPLayer.o
+./release\main.o
+./release\mainwindow.o
+./release\myqcustomplot.o
+./release\qcustomplot.o
+./release\tabledialog.o
+./release\tablemodel.o
+./release\tablewidget.o
+./release\moc_CrossPLayer.o
+./release\moc_mainwindow.o
+./release\moc_myqcustomplot.o
+./release\moc_qcustomplot.o
+./release\moc_tabledialog.o
+./release\moc_tablemodel.o
+./release\moc_tablewidget.o
+);

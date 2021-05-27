@@ -1,0 +1,17 @@
+INPUT(
+./debug\CrossPLayer.o
+./debug\main.o
+./debug\mainwindow.o
+./debug\myqcustomplot.o
+./debug\qcustomplot.o
+./debug\tabledialog.o
+./debug\tablemodel.o
+./debug\tablewidget.o
+./debug\moc_CrossPLayer.o
+./debug\moc_mainwindow.o
+./debug\moc_myqcustomplot.o
+./debug\moc_qcustomplot.o
+./debug\moc_tabledialog.o
+./debug\moc_tablemodel.o
+./debug\moc_tablewidget.o
+);
